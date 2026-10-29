@@ -1,0 +1,7 @@
+/dts-v1/;
+/ { #address-cells=<2>; #size-cells=<2>; compatible="qcom,kalama-mtp","qcom,kalama","qcom,mtp";
+ memory { device_type="memory"; reg=<0 0xa0000000 3 0x60000000>; };
+ chosen { bootargs="androidboot.hardware=qcom"; linux,initrd-start=<0 0xb5ff8000>; linux,initrd-end=<0 0xb7ffead8>; };
+ reserved-memory { #address-cells=<2>; #size-cells=<2>; ranges;
+ splash_region { reg=<0 0xb8000000 0 0x2b00000>; no-map; }; };
+};

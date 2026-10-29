@@ -1,0 +1,45 @@
+Sheng native boot menu
+
+Project tooling, standalone host programs, tests and documentation:
+GNU GPL version 3 only (SPDX: GPL-3.0-only). Full text: LICENSE.
+
+Boot-runtime integration is a required exception. src/, configs/, patches/,
+assets/menu-art.h, assets/menu-render.h and the advanced early-init template
+remain GPL-2.0-or-later. Full GPLv2 text: LICENSES/GPL-2.0.txt.
+The pinned U-Boot build contains GPLv2-only components, so its combined binary
+must remain GPLv2-compatible; the complete boot image is not GPLv3-only.
+See docs/LICENSING.md for the scope and compatibility details.
+U-Boot v2026.10 / commit 5508406582f6f7120dce0c4b3059819a41788db2:
+https://github.com/u-boot/u-boot
+
+libfdt retains its upstream dual GPL-2.0/BSD-2-Clause license and copyright
+headers. See vendor/libfdt/GPL and vendor/libfdt/BSD-2-Clause.
+
+The separately licensed slot-helper/hash/profile sources retain MIT, including
+the copyright and permission notice in advanced/slot-switch/LICENSE.
+Host-side GPLv3 build tools do not relicense their input programs or images.
+Generated build metadata and artwork declarations supplied by these tools may
+be used under GPL-2.0-or-later; input artwork/component notices still apply.
+
+Android head icon: Simple Icons, CC0, with Android robot artwork originating
+from Google under CC BY 3.0. Google/Android trademarks remain their owners'.
+https://github.com/simple-icons/simple-icons
+https://developer.android.com/distribute/marketing-tools/brand-guidelines
+https://creativecommons.org/licenses/by/3.0/
+
+Tux: original illustration by Larry Ewing using The GIMP; vector by Garrett
+LeSage, refined by IFo Hancroft, published as CC0 in garrett/Tux. The supplied
+flat-color derivative preserves contours and replaces shading with flat fills.
+https://github.com/garrett/Tux
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Reference text masks were rendered with Inter (Rasmus Andersson, SIL OFL).
+No font file is bundled; optional regeneration accepts the owner's font path.
+https://github.com/rsms/inter
+
+Related Linux/device work:
+https://github.com/ianchb/debian-sheng
+https://github.com/map220v
+https://github.com/alghiffaryfa19/Linux-xiaomi-sheng
+
+This community project is not affiliated with Xiaomi, Google or Debian.

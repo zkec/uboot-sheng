@@ -1,0 +1,18 @@
+name: Host tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      # Usage/version: https://github.com/actions/checkout
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Python and synthetic C tests
+        run: |
+          make test
+          make test-slot
+          python3 tools/check_public.py
+          python3 tools/make_source_release.py

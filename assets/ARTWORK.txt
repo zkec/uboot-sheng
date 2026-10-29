@@ -1,0 +1,19 @@
+Current boot-menu artwork:
+
+Android: head-only vector from Simple Icons, rendered in Android green.
+https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/android.svg
+Simple Icons: CC0 1.0 Universal.
+https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md
+Android robot artwork originates with Google (CC BY 3.0).
+
+Linux: maintained Tux vector by Garrett LeSage, refined by IFo Hancroft.
+Original Tux illustration by Larry Ewing, made with The GIMP.
+https://github.com/garrett/Tux (CC0)
+https://raw.githubusercontent.com/garrett/Tux/master/tux.svg
+
+Flat-color derivative: tools/flatten_tux.py keeps the original
+body, tummy, arms, feet, eyes, beak and nostril contours, removes all shadow
+and highlight layers, and uses solid charcoal, white and yellow fills.
+The resulting tux-standard-flat-color.svg contains no gradients or filters.
+The menu retains the original Tux proportions and colored beak and feet.
+

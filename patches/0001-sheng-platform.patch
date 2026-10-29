@@ -1,0 +1,95 @@
+diff --git a/arch/arm/mach-snapdragon/board.c b/arch/arm/mach-snapdragon/board.c
+index 35735f15..67b90946 100644
+--- a/arch/arm/mach-snapdragon/board.c
++++ b/arch/arm/mach-snapdragon/board.c
+@@ -366,14 +366,16 @@ static const char *get_cmdline(void)
+ void qcom_set_serialno(void)
+ {
+ 	const char *cmdline = get_cmdline();
+-	char serial[32];
++	char serial[32] = { 0 };
+ 
+ 	if (!cmdline) {
+ 		log_debug("Failed to get bootargs\n");
+ 		return;
+ 	}
+ 
+-	get_cmdline_option(cmdline, "androidboot.serialno=", serial, sizeof(serial));
++	if (get_cmdline_option(cmdline, "androidboot.serialno=", serial,
++			       sizeof(serial) - 1))
++		return;
+ 	if (serial[0] != '\0')
+ 		env_set("serial#", serial);
+ }
+diff --git a/drivers/clk/qcom/clock-sm8550.c b/drivers/clk/qcom/clock-sm8550.c
+index 7c06489b..3d5a410b 100644
+--- a/drivers/clk/qcom/clock-sm8550.c
++++ b/drivers/clk/qcom/clock-sm8550.c
+@@ -122,6 +122,7 @@ static const struct gate_clk sm8550_clks[] = {
+ 	GATE_CLK(GCC_AGGRE_UFS_PHY_AXI_CLK,		0x770e4, BIT(0)),
+ 	GATE_CLK(GCC_AGGRE_UFS_PHY_AXI_HW_CTL_CLK,	0x770e4, BIT(1)),
+ 	GATE_CLK(GCC_AGGRE_USB3_PRIM_AXI_CLK,		0x3908c, BIT(0)),
++	GATE_CLK(GCC_CFG_NOC_USB3_PRIM_AXI_CLK,		0x39088, BIT(0)),
+ 	GATE_CLK(GCC_CNOC_PCIE_SF_AXI_CLK,		0x52008, BIT(6)),
+ 	GATE_CLK(GCC_DDRSS_GPU_AXI_CLK,			0x71154, BIT(0)),
+ 	GATE_CLK(GCC_DDRSS_PCIE_SF_QTB_CLK,		0x52000, BIT(19)),
+diff --git a/drivers/gpio/qcom_pmic_gpio.c b/drivers/gpio/qcom_pmic_gpio.c
+index ad4a70dd..0f86bd82 100644
+--- a/drivers/gpio/qcom_pmic_gpio.c
++++ b/drivers/gpio/qcom_pmic_gpio.c
+@@ -38,6 +38,7 @@
+ #define REG_SUBTYPE_GPIO_MV_VIN3          0x13
+ 
+ #define REG_STATUS             0x08
++#define REG_RT_STATUS          0x10
+ #define REG_STATUS_VAL_MASK    0x1
+ 
+ /* MODE_CTL */
+@@ -127,11 +128,13 @@ static int qcom_gpio_set_direction(struct udevice *dev, unsigned int offset,
+ 
+ 	_qcom_gpio_set_direction(dev, offset, input, value);
+ 
+-	/* Set the right pull (no pull) */
+-	ret = pmic_reg_write(plat->pmic, gpio_base + REG_DIG_PULL_CTL,
+-			     REG_DIG_PULL_NO_PU);
+-	if (ret < 0)
+-		return ret;
++	/* Preserve the firmware's input bias, including the Volume Up pull-up. */
++	if (!input) {
++		ret = pmic_reg_write(plat->pmic, gpio_base + REG_DIG_PULL_CTL,
++				     REG_DIG_PULL_NO_PU);
++		if (ret < 0)
++			return ret;
++	}
+ 
+ 	/* Configure output pin drivers if needed */
+ 	if (!input) {
+@@ -204,7 +207,8 @@ static int qcom_gpio_get_value(struct udevice *dev, unsigned offset)
+ 	uint32_t gpio_base = plat->pid + REG_OFFSET(offset);
+ 	int reg;
+ 
+-	reg = pmic_reg_read(plat->pmic, gpio_base + REG_STATUS);
++	reg = pmic_reg_read(plat->pmic, gpio_base +
++			    (plat->lv_mv_type ? REG_RT_STATUS : REG_STATUS));
+ 	if (reg < 0)
+ 		return reg;
+ 
+@@ -322,7 +326,9 @@ static int qcom_gpio_probe(struct udevice *dev)
+ 	}
+ 
+ 	plat->lv_mv_type = val == REG_SUBTYPE_GPIO_LV ||
+-			   val == REG_SUBTYPE_GPIO_MV;
++			   val == REG_SUBTYPE_GPIO_MV ||
++			   val == REG_SUBTYPE_GPIO_LV_VIN2 ||
++			   val == REG_SUBTYPE_GPIO_MV_VIN3;
+ 
+ 	/*
+ 	 * Parse basic GPIO count specified via the gpio-ranges property
+@@ -347,6 +353,7 @@ static const struct udevice_id qcom_gpio_ids[] = {
+ 	{ .compatible = "qcom,pms405-gpio" },
+ 	{ .compatible = "qcom,pm6125-gpio" },
+ 	{ .compatible = "qcom,pm8150-gpio" },
++	{ .compatible = "qcom,pm8550-gpio" },
+ 	{ }
+ };
+ 
